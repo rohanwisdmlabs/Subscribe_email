@@ -145,6 +145,7 @@ if(isset($_POST['email']))
 
 			echo '<script>alert("Hooray Subcribed Successfully!");</script>';
 		}
+		send_mail($email);
 	  }
 
 	} 
@@ -197,6 +198,51 @@ if(isset($_POST['email']))
 	<input type="email" name="email" value="<?php echo isset( $setting ) ? esc_attr( $setting ) : ''; ?>">
     <?php
  }
+
+
+ function send_mail($to)
+{
+    $subject = 'Congratulations';
+    
+    $message = 'You are Successfully added to our Daily Update List';
+    $message .= "\n\n";
+    $message .= "Here are our Top latest Posts";
+    $message .= "\n";
+	$summary = get_summary();
+    foreach ($summary as $post_data) {
+        $message .= 'Title: ' . $post_data['title'] . "\n";
+        $message .= 'URL: ' . $post_data['url'] . "\n";
+        $message .= "\n";
+    }
+
+   
+
+    wp_mail($to, $subject, $message, '');
+};
+
+function get_summary()
+{
+    $args = array(
+        'date_query' => array(
+            array(
+                'after' => '24 hours ago',
+            ),
+        ),
+    );
+    $query = new WP_Query($args);
+    $posts = $query->posts;
+    $summary = array();
+
+    foreach ($posts as $post) {
+        $post_data = array(
+            'title' => $post->post_title,
+            'url' => get_permalink($post->ID),
+        );
+        array_push($summary, $post_data);
+    }
+
+    return $summary;
+}
 
 
  
