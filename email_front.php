@@ -74,15 +74,15 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-email_front.php';
  * @since    1.0.0
  */
 
- function enqueu_scripts()
- {
-	wp_enqueue_script('em_ajax', plugin_dir_url(__FILE__).'ajax.js', 'jQuery', 1.0, true);
-	wp_localize_script('em_ajax', 'em_ajax_url', array(
-		'ajax_url' => admin_url('admin-ajax.php')
-	));
- }
+//  function enqueu_scripts()
+//  {
+// 	wp_enqueue_script('em_ajax', plugin_dir_url(__FILE__).'ajax.js', 'jQuery', 1.0, false);
+// 	wp_localize_script('em_ajax', 'em_ajax_url', array(
+// 		'ajax_url' => admin_url('admin-ajax.php')
+// 	));
+//  }
 
- add_action('wp_enqueue_scripts', 'enqueu_scripts');
+//  add_action('wp_enqueue_scripts', 'enqueu_scripts');
 
 
 
@@ -101,7 +101,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-email_front.php';
    ?>
    
    <div class="input_form">
-	<form action="options.php" method="post">
+	<form  method="post">
       <?php
 	  settings_fields('email_front');
 	 do_settings_sections('email_front');
@@ -110,13 +110,65 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-email_front.php';
 	  ?>
 
 
+
+
+	 
+	  
+
+
 	</form>
  </div>
 <?php
 
+if(isset($_POST['email']))
+{
+	$email=$_POST['email'];
+	if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		
+      if(isset($_POST['submit']))
+	  {
+		$new_emails=get_option('new_emails');
 
-  
+		if(!$new_emails)
+		{
+			$new_emails=array();
+		}
+
+
+		if(in_array($email,$new_emails))
+		{
+			echo '<script>alert("Hey Folk you are all ready subscribed!");</script>';
+		}
+		else{
+			$new_emails[]=$email;
+			update_option('new_emails', $new_emails);
+
+			echo '<script>alert("Hooray Subcribed Successfully!");</script>';
+		}
+	  }
+
+	} 
+}
+
  }
+
+
+ function callback()
+ {
+	email_front_cb();
+	if(isset($_POST['email']))
+	{
+	  echo "helo";
+	}
+
+
+	
+
+ }
+
+ add_action('wp_head','callback');
+
+ 
 
 
  function email_register_settings()
@@ -142,21 +194,14 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-email_front.php';
 	// output the field
 	?>
 	<label for="email_id"></label>
-	<input type="email" name="email_id" value="<?php echo isset( $setting ) ? esc_attr( $setting ) : ''; ?>">
+	<input type="email" name="email" value="<?php echo isset( $setting ) ? esc_attr( $setting ) : ''; ?>">
     <?php
  }
 
 
- //ajax call
+ 
 
- function ajax_handler()
- {
 
-  echo $_POST[email];
-	
- }
-
- add_action('ap_ajax_my_email', 'ajax_handler');
 
 
 
